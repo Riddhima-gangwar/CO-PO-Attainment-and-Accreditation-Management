@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Course } from '@/data/mockData';
-import { BookOpen, Users, Award, ChevronRight } from 'lucide-react';
+import { BookOpen, Users, Award, ChevronRight, ExternalLink } from 'lucide-react';
 
 interface CourseListProps {
   courses: Course[];
@@ -24,7 +25,7 @@ export const CourseList: React.FC<CourseListProps> = ({
           <div
             key={course.id}
             onClick={() => onSelectCourse(course)}
-            className={`p-5 rounded-xl border transition-all cursor-pointer bg-white ${
+            className={`p-5 rounded-xl border transition-all cursor-pointer bg-white group ${
               isSelected
                 ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
@@ -35,7 +36,7 @@ export const CourseList: React.FC<CourseListProps> = ({
                 <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
                   {course.code}
                 </span>
-                <h3 className="mt-2 text-base font-bold text-gray-900 line-clamp-1">
+                <h3 className="mt-2 text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
                   {course.title}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">{course.departmentName}</p>
@@ -65,15 +66,27 @@ export const CourseList: React.FC<CourseListProps> = ({
               </div>
               <div className="flex items-center gap-1.5">
                 <Award className="h-3.5 w-3.5 text-gray-400" />
-                <span>{course.coCount} COs Defined</span>
+                <span>{course.coCount} COs</span>
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-xs text-gray-400 pt-2">
-              <span>Faculty: {course.facultyName}</span>
-              <span className="flex items-center text-blue-600 font-medium">
-                Manage Outcomes <ChevronRight className="h-3.5 w-3.5 ml-0.5" />
+            <div className="mt-3 flex items-center justify-between text-xs pt-2 border-t border-gray-50">
+              <span className="text-gray-500 truncate max-w-[160px]">
+                Incharge: {course.facultyName}
               </span>
+              <div className="flex items-center gap-3">
+                <Link
+                  href={`/courses/${course.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-xs font-semibold text-gray-600 hover:text-blue-600 flex items-center gap-1 py-1 px-2 rounded hover:bg-gray-100 transition-colors"
+                  title="View full course page"
+                >
+                  <ExternalLink className="h-3 w-3" /> Full Details
+                </Link>
+                <span className="flex items-center text-blue-600 font-semibold group-hover:translate-x-0.5 transition-transform">
+                  Select <ChevronRight className="h-3.5 w-3.5 ml-0.5" />
+                </span>
+              </div>
             </div>
           </div>
         );

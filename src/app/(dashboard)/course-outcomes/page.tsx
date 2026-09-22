@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Course, CourseOutcome } from '@/data/mockData';
 import { courseService } from '@/services/courseService';
 import { outcomeService } from '@/services/outcomeService';
 import { COList } from '@/components/outcomes/COList';
 import { COForm } from '@/components/outcomes/COForm';
-import { Plus, Target, BookOpen } from 'lucide-react';
+import { Plus, Target, BookOpen, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export default function CourseOutcomesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -116,6 +117,33 @@ export default function CourseOutcomesPage() {
 
       {/* Outcomes Grid */}
       <COList cos={outcomes} onDeleteCO={handleDeleteCO} />
+
+      {/* Primary Workflow Guidance Callout */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <span className="text-[10px] font-bold tracking-wider uppercase text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded">
+            Step 2 of 5 in Outcome Lifecycle
+          </span>
+          <h3 className="text-sm font-bold text-gray-900 mt-1">Outcomes Formulated</h3>
+          <p className="text-xs text-gray-600 mt-0.5">
+            Now map these course outcomes against standard NBA Program Outcomes (PO1–PO12).
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/courses"
+            className="px-3.5 py-2 text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to Courses
+          </Link>
+          <Link
+            href="/co-po-mapping"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors shadow-sm shrink-0 flex items-center gap-1.5"
+          >
+            Proceed to CO-PO Mapping <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
