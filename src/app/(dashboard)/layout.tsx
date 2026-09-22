@@ -10,18 +10,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-[#F8FAFC]">
-      {/* Reusable Modular Sidebar */}
+    <div className="flex min-h-screen flex-col bg-[#132A42]">
       <Sidebar />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-        {/* Reusable Modular Navbar */}
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <Navbar />
 
-        {/* Page Content Viewport */}
         <div className="flex-1 overflow-auto custom-scrollbar">
-          <div className="max-w-7xl mx-auto w-full p-8">
+          <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-10">
             {children}
           </div>
         </div>

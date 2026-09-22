@@ -36,17 +36,17 @@ export const AttainmentTrendChart: React.FC = () => {
   const departments = trendData[timeframe] || trendData['Last 4 Semesters'];
 
   return (
-    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_12px_30px_rgba(13,27,46,0.12)] lg:col-span-2">
       {/* Chart Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Program Attainment Trends</h2>
-          <p className="text-sm text-gray-500">Comparing PO attainment across departments</p>
+          <h2 className="text-lg font-bold text-[#10243A]">Program Attainment Trends</h2>
+          <p className="text-sm text-slate-500">Comparing PO attainment across departments</p>
         </div>
         <select
           value={timeframe}
           onChange={(e) => setTimeframe(e.target.value)}
-          className="bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 block p-2"
+          className="block rounded-lg border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700 focus:border-[#F6B85E] focus:ring-[#F6B85E]"
         >
           <option>Last 4 Semesters</option>
           <option>Last Year</option>
@@ -56,7 +56,7 @@ export const AttainmentTrendChart: React.FC = () => {
 
       {/* Visual Chart Bars */}
       <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-end gap-6 text-xs text-gray-500 pb-2 border-b border-gray-100">
+        <div className="flex items-center justify-end gap-6 border-b border-slate-100 pb-2 text-xs text-slate-500">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-sm bg-blue-600 inline-block"></span>
             <span>Attained Score (%)</span>
@@ -73,11 +73,11 @@ export const AttainmentTrendChart: React.FC = () => {
           return (
             <div key={dept.code} className="space-y-1.5">
               <div className="flex justify-between items-center text-sm">
-                <span className="font-medium text-gray-800">
-                  {dept.name} <span className="text-xs text-gray-400">({dept.code})</span>
+                <span className="font-medium text-[#10243A]">
+                  {dept.name} <span className="text-xs text-slate-400">({dept.code})</span>
                 </span>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400">Target: {dept.target}%</span>
+                  <span className="text-xs text-slate-400">Target: {dept.target}%</span>
                   <span
                     className={`font-semibold text-xs px-2 py-0.5 rounded-full ${
                       isTargetMet
@@ -91,7 +91,7 @@ export const AttainmentTrendChart: React.FC = () => {
               </div>
 
               {/* Progress Track */}
-              <div className="relative h-4 bg-gray-100 rounded-full overflow-hidden">
+              <div className="relative h-4 overflow-hidden rounded-full bg-slate-100">
                 {/* Target Marker Line */}
                 <div
                   className="absolute top-0 bottom-0 w-0.5 bg-gray-400 z-10"
@@ -102,8 +102,8 @@ export const AttainmentTrendChart: React.FC = () => {
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     isTargetMet
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600'
-                      : 'bg-gradient-to-r from-amber-400 to-amber-500'
+                      ? 'bg-gradient-to-r from-[#2E87C8] to-[#1D4E89]'
+                      : 'bg-gradient-to-r from-[#F6B85E] to-[#E77B4D]'
                   }`}
                   style={{ width: `${dept.attained}%` }}
                 ></div>
@@ -114,9 +114,9 @@ export const AttainmentTrendChart: React.FC = () => {
       </div>
 
       {/* Chart Footer Indicator */}
-      <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500">
         <span className="flex items-center gap-1">
-          <BarChart3 className="h-3.5 w-3.5 text-blue-600" />
+          <BarChart3 className="h-3.5 w-3.5 text-[#E77B4D]" />
           Average Institutional Attainment: <strong>72.4%</strong>
         </span>
         <span>NBA Benchmark Threshold: 60.0%</span>

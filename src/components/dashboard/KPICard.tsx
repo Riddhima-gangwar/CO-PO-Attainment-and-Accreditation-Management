@@ -15,8 +15,8 @@ interface KPICardProps {
 
 const colorStyles = {
   blue: {
-    iconBg: 'bg-blue-50 text-blue-600',
-    watermark: 'text-blue-600',
+    iconBg: 'bg-blue-50 text-blue-700',
+    watermark: 'text-blue-700',
   },
   indigo: {
     iconBg: 'bg-indigo-50 text-indigo-600',
@@ -44,7 +44,7 @@ export const KPICard: React.FC<KPICardProps> = ({
   const styles = colorStyles[colorScheme];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 relative overflow-hidden group hover:shadow-md transition-shadow">
+    <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(13,27,46,0.12)] transition-shadow group hover:shadow-[0_16px_36px_rgba(13,27,46,0.2)]">
       {/* Background Watermark Icon */}
       <div
         className={`absolute top-0 right-0 p-4 opacity-10 ${styles.watermark} group-hover:scale-110 group-hover:opacity-20 transition-all duration-300`}
@@ -58,8 +58,8 @@ export const KPICard: React.FC<KPICardProps> = ({
           <Icon className="h-6 w-6" />
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <h3 className="text-2xl font-bold text-[#10243A]">{value}</h3>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export const KPICard: React.FC<KPICardProps> = ({
               {change}
             </span>
           )}
-          {timeframe && <span className="text-gray-400 ml-2">{timeframe}</span>}
+          {timeframe && <span className="ml-2 text-slate-400">{timeframe}</span>}
         </div>
       )}
     </div>

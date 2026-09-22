@@ -42,8 +42,11 @@ const mockActivities: ActivityItem[] = [
 
 export const ActivityFeed: React.FC = () => {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">Action Items & Activity</h2>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_12px_30px_rgba(13,27,46,0.12)]">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-[#10243A]">Action Items & Activity</h2>
+        <span className="rounded-full bg-[#FFF1E8] px-2.5 py-1 text-xs font-semibold text-[#E66C4D]">3 updates</span>
+      </div>
 
       <div className="space-y-6">
         {mockActivities.map((item) => (
@@ -69,18 +72,18 @@ export const ActivityFeed: React.FC = () => {
 
             {/* Content */}
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">{item.title}</p>
-              <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+              <p className="text-sm font-semibold text-[#10243A]">{item.title}</p>
+              <p className="mt-1 text-sm text-slate-500">{item.description}</p>
               {item.actionText && item.actionHref && (
                 <Link
                   href={item.actionHref}
-                  className="text-blue-600 text-sm font-medium mt-2 inline-block hover:underline"
+                  className="mt-2 inline-block text-sm font-semibold text-[#D96B4B] hover:underline"
                 >
                   {item.actionText}
                 </Link>
               )}
               {item.timeAgo && (
-                <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                <p className="mt-1 flex items-center gap-1 text-xs text-slate-400">
                   <Clock className="h-3 w-3" /> {item.timeAgo}
                 </p>
               )}

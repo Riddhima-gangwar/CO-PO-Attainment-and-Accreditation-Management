@@ -4,21 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
-  GraduationCap,
   BookOpen,
-  Target,
-  FileCheck,
-  ClipboardList,
-  PenTool,
-  BarChart4,
-  Award,
-  ShieldCheck,
-  FileText,
-  PieChart,
-  Users,
-  Settings,
-  Activity,
+  ChevronDown,
+  GraduationCap,
+  LayoutDashboard,
   LucideIcon,
 } from 'lucide-react';
 
@@ -33,18 +22,18 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon: Icon, label }) => {
   const active = pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <li>
+    <li className="list-none">
       <Link
         href={href}
-        className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
+        className={`flex items-center gap-2 whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors group ${
           active
-            ? 'bg-blue-50 text-blue-700 shadow-sm'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            ? 'text-white'
+            : 'text-slate-300 hover:text-white'
         }`}
       >
         <Icon
-          className={`mr-3 h-5 w-5 transition-colors ${
-            active ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+          className={`h-4 w-4 transition-colors ${
+            active ? 'text-[#F6B85E]' : 'text-slate-400 group-hover:text-[#F6B85E]'
           }`}
         />
         {label}
@@ -53,64 +42,30 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon: Icon, label }) => {
   );
 };
 
-const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h3 className="px-3 text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-6">
-    {children}
-  </h3>
-);
-
 export const Sidebar: React.FC = () => {
   return (
-    <aside className="w-72 bg-white border-r border-gray-200 flex flex-col h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10 relative">
-      {/* Brand Header */}
-      <div className="h-16 flex items-center px-6 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <span className="text-white font-bold text-lg">O</span>
+    <aside className="shrink-0 bg-[#0D1B2E] text-white">
+      <div className="h-2 bg-[#F6B85E]" />
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-5 sm:px-6 lg:px-10">
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xl font-black text-[#F26E42]">O</span>
+            <span className="hidden text-lg font-bold tracking-[0.18em] text-white sm:inline">OUTCOME360</span>
+          </Link>
+          <div className="hidden items-center gap-2 text-xs text-slate-400 md:flex">
+            <span className="h-2 w-2 rounded-full bg-emerald-400" /> OBE management portal
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">
-            Outcome360
-          </span>
         </div>
-      </div>
 
-      {/* Navigation List */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
-        <nav className="space-y-1">
-          <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard overview" />
-
-          <SectionTitle>Academic Management</SectionTitle>
-          <ul className="space-y-1">
-            <NavItem href="/programs" icon={GraduationCap} label="Programs" />
-            <NavItem href="/courses" icon={BookOpen} label="Courses" />
-            <NavItem href="/course-outcomes" icon={Target} label="CO Management" />
-            <NavItem href="/program-outcomes" icon={FileCheck} label="PO Management" />
-            <NavItem href="/program-specific-outcomes" icon={FileCheck} label="PSO Management" />
-          </ul>
-
-          <SectionTitle>Attainment</SectionTitle>
-          <ul className="space-y-1">
-            <NavItem href="/assessments" icon={ClipboardList} label="Assessments" />
-            <NavItem href="/student-marks" icon={PenTool} label="Student Marks" />
-            <NavItem href="/co-attainment" icon={BarChart4} label="CO Attainment" />
-            <NavItem href="/co-po-mapping" icon={PieChart} label="CO-PO Mapping" />
-            <NavItem href="/po-attainment" icon={Award} label="PO Attainment" />
-          </ul>
-
-          <SectionTitle>Accreditation & Reports</SectionTitle>
-          <ul className="space-y-1">
-            <NavItem href="/reports" icon={FileText} label="Reports & SSR" />
-            <NavItem href="/accreditation/criteria" icon={ShieldCheck} label="Criteria framework" />
-            <NavItem href="/accreditation/evidence" icon={FileText} label="Evidence & Documents" />
-            <NavItem href="/accreditation/compliance" icon={Target} label="Compliance Tracker" />
-          </ul>
-
-          <SectionTitle>Administration</SectionTitle>
-          <ul className="space-y-1 pb-4">
-            <NavItem href="/users" icon={Users} label="User Management" />
-            <NavItem href="/settings" icon={Settings} label="System Settings" />
-            <NavItem href="/activity-logs" icon={Activity} label="Activity Logs" />
-          </ul>
+        <nav className="flex items-center gap-1 overflow-x-auto pb-1">
+          <NavItem href="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+          <NavItem href="/programs" icon={GraduationCap} label="Academics" />
+          <NavItem href="/courses" icon={BookOpen} label="Courses" />
+          <NavItem href="/course-outcomes" icon={BookOpen} label="Outcomes" />
+          <NavItem href="/reports" icon={BookOpen} label="Reports" />
+          <button className="flex items-center gap-1 whitespace-nowrap px-3 py-2 text-sm font-medium text-slate-300 hover:text-white">
+            More <ChevronDown className="h-4 w-4" />
+          </button>
         </nav>
       </div>
     </aside>
