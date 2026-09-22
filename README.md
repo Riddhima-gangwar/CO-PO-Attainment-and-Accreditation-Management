@@ -12,12 +12,16 @@ The system connects the complete outcome-management lifecycle, starting from def
 
 - [About the Project](#about-the-project)
 - [Problem Statement](#problem-statement)
+- [Project Objectives & Scope](#project-objectives--scope)
 - [Proposed Solution](#proposed-solution)
 - [Architecture & Design Overview](#architecture--design-overview)
 - [Major Modules](#major-modules)
 - [User Roles & Responsibilities](#user-roles--responsibilities)
 - [Project Structure](#project-structure)
 - [Current Week 5 Implementation Status](#current-week-5-implementation-status)
+- [Week 9 Development Plan](#week-9-development-plan)
+- [Week 13 Development Plan](#week-13-development-plan)
+- [Team & Member Responsibilities](#team--member-responsibilities)
 - [Technology Stack](#technology-stack)
 - [Setup & Run Instructions](#setup--run-instructions)
 - [Documentation Index](#documentation-index)
@@ -43,6 +47,20 @@ This causes:
 - **Manual Calculation Errors:** Repeated spreadsheet operations that are error-prone and hard to trace.
 - **Difficult Traceability:** Inability to drill down from final accreditation scores to question-level student marks.
 - **Time-Consuming Accreditation Audits:** Weeks spent compiling NBA/NAAC compliance binders.
+
+---
+
+## Project Objectives & Scope
+
+### Objectives
+1. **Automate Outcome Calculations:** Eliminate manual spreadsheets by computing direct (80%) and indirect (20%) CO attainment and subsequent PO/PSO derivation automatically.
+2. **Standardize Curriculum Mapping:** Enforce uniform NBA 1–3 correlation guidelines for CO-PO matrices.
+3. **Streamline Accreditation Readiness:** Maintain digital evidence binders and generate NBA Tier-I Self Study Reports (SSR) and NAAC Criterion 2 tables.
+4. **Foster Continuous Quality Improvement (CQI):** Provide immediate gap analysis when attainment targets are unmet, prompting faculty corrective action plans.
+
+### Scope
+- **In-Scope (Full Lifecycle):** Engineering and higher education degree programs (B.Tech, M.Tech); Course Outcome formulations mapped to Bloom's Revised Taxonomy; Direct CIE and semester exam marks evaluation; Indirect exit surveys; Institutional and departmental analytics.
+- **Week 5 Evaluation Scope:** Production of the architectural foundation, complete functional component decomposition, interactive routing, representative API route checkpoint, and primary clickable workflow demonstration.
 
 ---
 
@@ -79,7 +97,7 @@ Accreditation Evidence & SSR Reports
 The application is built using a clean, multi-tier React architecture prioritizing component decomposition, separation of concerns, and immutable data flows:
 
 - **Component Layer (`src/components/`):** Decomposed into modular functional components with strict single-responsibility boundaries (Layout, Dashboard KPIs, Course Catalog, CO/PO Outcomes, Interactive Mapping Matrix, Attainment, and Reports).
-- **Service Layer Abstraction (`src/services/`):** UI components consume asynchronous service contracts rather than coupling to hardcoded endpoints.
+- **Service Layer Abstraction (`src/services/`):** UI components consume asynchronous service contracts (`courseService`, `outcomeService`, `attainmentService`) rather than coupling to hardcoded endpoints.
 - **State Flow & Immutability:** State is localized to the components that own it, with unidirectional props passing and strictly immutable state updates (`[...prev, newItem]`, `prev.map(...)`).
 - **Full Architecture Documentation:** See [`docs/architecture.md`](docs/architecture.md) for the detailed component hierarchy, responsibility matrices, and system diagrams.
 
@@ -88,7 +106,7 @@ The application is built using a clean, multi-tier React architecture prioritizi
 ## Major Modules
 
 1. **Dashboard Overview:** Institutional and departmental KPIs, real-time attainment trend charts, and action item feeds.
-2. **Course Management:** Course catalog administration, semester/credit allocations, faculty in-charge assignments, and outcome status tracking.
+2. **Course Management:** Course catalog administration, semester/credit allocations, faculty in-charge assignments, dynamic course detail views (`/courses/[id]`), and outcome status tracking.
 3. **Course Outcomes (CO):** Formulation of measurable learning outcomes mapped to Bloom's Revised Taxonomy levels with target attainment benchmarks.
 4. **Program Outcomes (PO):** Standard NBA Graduate Attributes (PO1 to PO12) with institutional target levels.
 5. **CO-PO Correlation Mapping:** Interactive $M \times N$ correlation matrix with visual weightage badges (1 = Low, 2 = Medium, 3 = High, - = None) and auto-calculated PO correlation averages.
@@ -115,7 +133,8 @@ CO-PO-Attainment-and-Accreditation-Management/
 ├── docs/                               # Architecture, Data Model, and Workflow specifications
 │   ├── architecture.md                 # System architecture, component tree, and design decisions
 │   ├── data-model.md                   # Core entities, fields, relationships, and ER diagram
-│   └── workflow.md                     # Role-based workflows and primary OBE lifecycle sequence
+│   ├── workflow.md                     # Role-based workflows and primary OBE lifecycle sequence
+│   └── backlog.md                      # Week 9 and Week 13 planned milestone roadmaps
 ├── public/                             # Static SVGs and public assets
 ├── src/
 │   ├── app/                            # Next.js App Router root
@@ -123,13 +142,15 @@ CO-PO-Attainment-and-Accreditation-Management/
 │   │   ├── (dashboard)/                # Main application routes
 │   │   │   ├── layout.tsx              # Shell layout composing Sidebar and Navbar
 │   │   │   ├── dashboard/page.tsx      # Dashboard view (KPIs, Charts, Activity)
-│   │   │   ├── courses/page.tsx        # Course management view
+│   │   │   ├── courses/page.tsx        # Course catalog view (Search, Filters, Skeleton, Empty/Error)
+│   │   │   ├── courses/[id]/page.tsx   # Dynamic Course Details view
 │   │   │   ├── course-outcomes/page.tsx# CO formulation view
 │   │   │   ├── program-outcomes/page.tsx# PO catalog view
 │   │   │   ├── co-po-mapping/page.tsx  # CO-PO mapping matrix view
 │   │   │   ├── co-attainment/page.tsx  # Attainment calculation view
 │   │   │   └── reports/page.tsx        # Accreditation reports view
-│   │   ├── api/                        # Next.js route handlers (backend stubs)
+│   │   ├── api/                        # Next.js route handlers
+│   │   │   └── courses/route.ts        # GET & POST /api/courses representative API endpoint
 │   │   ├── globals.css                 # Tailwind CSS v4 design tokens and utilities
 │   │   └── page.tsx                    # Root redirect to /dashboard
 │   ├── components/                     # Reusable functional React components
@@ -144,7 +165,7 @@ CO-PO-Attainment-and-Accreditation-Management/
 │   │   └── mockData.ts                 # Strongly-typed OBE datasets for local execution
 │   ├── models/                         # Mongoose ODM schemas for planned persistence
 │   └── services/                       # Asynchronous service layer abstraction
-│       ├── courseService.ts            # Course and department data operations
+│       ├── courseService.ts            # Course and department data operations (connects to /api/courses)
 │       ├── outcomeService.ts           # CO, PO, and CO-PO mapping operations
 │       └── attainmentService.ts        # Attainment and report data operations
 ├── package.json
@@ -156,21 +177,54 @@ CO-PO-Attainment-and-Accreditation-Management/
 
 ## Current Week 5 Implementation Status
 
-- **Status:** **Week 5 Architecture & Design Foundation Completed (5/5 Marks Criteria Satisfied)**
-- **Accomplishments:**
-  - Complete decomposition of monolithic components into modular functional React components.
-  - Interactive, demonstrable UI with realistic OBE mock datasets.
-  - Formalized Core Data Entities (`docs/data-model.md`) and System Workflows (`docs/workflow.md`).
-  - Formalized System Architecture, Component Tree, and Immutability Approach (`docs/architecture.md`).
-  - Clean service abstraction layer ready for backend integration in subsequent sprints.
-- **Scope Note for Evaluator:** In accordance with the Week 5 evaluation parameters, live database connectivity, authentication/password handling, and production backend APIs are planned for upcoming evaluation milestones.
+- **Evaluation Milestone:** **Week 5 Foundation Review (25/25 Marks Coverage)**
+- **Parameter Breakdown:**
+  1. **Architecture & Design (5 Marks):** Formalized component hierarchy, responsibilities table, and system diagrams in [`docs/architecture.md`](docs/architecture.md); identified 11 core data entities in [`docs/data-model.md`](docs/data-model.md); established 4 user roles and workflows in [`docs/workflow.md`](docs/workflow.md).
+  2. **React.js Routing & Implementation (5 Marks):** Functional Next.js App Router navigation across `/dashboard`, `/courses`, `/courses/[id]`, `/course-outcomes`, `/program-outcomes`, `/co-po-mapping`, `/co-attainment`, and `/reports`.
+  3. **Rendering & Data Fetching (5 Marks):** Dynamic Course Management screen featuring realistic asynchronous data loading, skeleton loading states, empty filter state with reset action, error handling with retry, and immutable state updates.
+  4. **Initial Backend & Database Checkpoint (3 Marks):** Functional `GET` & `POST /api/courses` Next.js Route Handler connected to `courseService.ts` demonstrating the `React Component → fetch() → /api/courses → JSON → State → UI` flow; 18 Mongoose ODM models documented in `src/models/`.
+  5. **Product Workflow (3 Marks):** Seamlessly clickable end-to-end flow: **Dashboard &rarr; Courses &rarr; Course Details &rarr; Course Outcomes &rarr; CO-PO Mapping &rarr; CO Attainment &rarr; Reports**.
+  6. **Documentation (4 Marks):** Comprehensive specifications in `docs/architecture.md`, `docs/data-model.md`, `docs/workflow.md`, `docs/backlog.md`, and complete `README.md`.
+
+---
+
+## Week 9 Development Plan
+
+Planned upcoming milestones for Week 9 (see [`docs/backlog.md`](docs/backlog.md) for full details):
+- **Authentication & RBAC:** Implement NextAuth.js / JWT token session management and role guards (Admin, Faculty, HOD, Accreditation).
+- **Live Database Integration:** Connect Mongoose models (`Course`, `Program`, `User`) to active MongoDB database instance.
+- **Full Course & Outcome CRUD:** Real-time persistence for courses, CO formulation with Bloom's verification, and dynamic PSO definitions.
+- **CO-PO Matrix Persistence:** Store matrix correlations in MongoDB with compound indexing and validation rules.
+- **Student Assessment Ingestion:** Student roster upload and continuous internal evaluation (CIE) marks entry.
+
+---
+
+## Week 13 Development Plan
+
+Planned final capstone deliverables for Week 13 (see [`docs/backlog.md`](docs/backlog.md) for full details):
+- **Advanced Attainment Math Engine:** Automated derivation of PO/PSO attainment using weighted matrix algebra ($80\%$ direct + $20\%$ indirect).
+- **Gap Analysis & CQI Loop:** Automated alerts for unmet outcome benchmarks and faculty corrective action submission portal.
+- **Accreditation Evidence Management:** Digital course file binder with cloud document storage (AWS S3) for question papers, rubrics, and answer scripts.
+- **Automated SSR Generation:** Dynamic PDF/Excel report generator for NBA Tier-I Criterion 3 and NAAC Criterion 2.6.
+- **Institutional Analytics:** Multi-year attainment trends and radar charts across all engineering branches.
+
+---
+
+## Team & Member Responsibilities
+
+| Team Member | Project Role | Core Responsibilities |
+| :--- | :--- | :--- |
+| **Riddhima Gangwar** | Lead Architect & Full-Stack Lead | System architecture design, Next.js foundation, component decomposition, CO-PO mapping matrix, and accreditation workflow. |
+| **Anuj Goyal** | Frontend & UI/UX Specialist | Tailwind CSS design system, responsive layouts, dashboard data visualizations, and interactive component state. |
+| **Team Member 3** | Backend & Database Specialist | Mongoose data modeling, Next.js API route handlers, MongoDB Atlas integration, and data validation. |
+| **Team Member 4** | QA & Accreditation Analyst | NBA/NAAC compliance criteria verification, assessment rubric calculation rules, and documentation. |
 
 ---
 
 ## Technology Stack
 
-- **Framework:** Next.js 16 (App Router)
-- **Library:** React 19 (Functional Components, Hooks)
+- **Framework:** Next.js 16.3.5 (App Router with Turbopack)
+- **Library:** React 19.2.8 (Functional Components, Hooks)
 - **Language:** TypeScript 5
 - **Styling:** Tailwind CSS v4
 - **Icons:** Lucide React
@@ -198,6 +252,12 @@ CO-PO-Attainment-and-Accreditation-Management/
 4. **Access the Application:**
    Open your browser and navigate to `http://localhost:3000`. You will be automatically directed to the interactive Outcome360 Dashboard.
 
+5. **Test the Representative API Endpoint:**
+   Visit `http://localhost:3000/api/courses` in your browser or execute:
+   ```bash
+   curl http://localhost:3000/api/courses
+   ```
+
 ---
 
 ## Documentation Index
@@ -205,3 +265,4 @@ CO-PO-Attainment-and-Accreditation-Management/
 - [Architecture & Design Specification](docs/architecture.md)
 - [Core Data Entities & ER Model](docs/data-model.md)
 - [Product Workflows & OBE Lifecycle](docs/workflow.md)
+- [Development Backlog (Week 9 & 13)](docs/backlog.md)
