@@ -21,7 +21,6 @@ The system connects the complete outcome-management lifecycle, starting from def
 - [Current Week 5 Implementation Status](#current-week-5-implementation-status)
 - [Week 9 Development Plan](#week-9-development-plan)
 - [Week 13 Development Plan](#week-13-development-plan)
-- [Team & Member Responsibilities](#team--member-responsibilities)
 - [Technology Stack](#technology-stack)
 - [Setup & Run Instructions](#setup--run-instructions)
 - [Documentation Index](#documentation-index)
