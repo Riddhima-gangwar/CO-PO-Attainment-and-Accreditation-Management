@@ -210,17 +210,6 @@ Planned final capstone deliverables for Week 13 (see [`docs/backlog.md`](docs/ba
 
 ---
 
-## Team & Member Responsibilities
-
-| Team Member | Project Role | Core Responsibilities |
-| :--- | :--- | :--- |
-| **Riddhima Gangwar** | Lead Architect & Full-Stack Lead | System architecture design, Next.js foundation, component decomposition, CO-PO mapping matrix, and accreditation workflow. |
-| **Anuj Goyal** | Frontend & UI/UX Specialist | Tailwind CSS design system, responsive layouts, dashboard data visualizations, and interactive component state. |
-| **Team Member 3** | Backend & Database Specialist | Mongoose data modeling, Next.js API route handlers, MongoDB Atlas integration, and data validation. |
-| **Team Member 4** | QA & Accreditation Analyst | NBA/NAAC compliance criteria verification, assessment rubric calculation rules, and documentation. |
-
----
-
 ## Technology Stack
 
 - **Framework:** Next.js 16.3.5 (App Router with Turbopack)
