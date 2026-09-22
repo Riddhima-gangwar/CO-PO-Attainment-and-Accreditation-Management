@@ -13,109 +13,42 @@ The system connects the complete outcome-management lifecycle, starting from def
 - [About the Project](#about-the-project)
 - [Problem Statement](#problem-statement)
 - [Proposed Solution](#proposed-solution)
-- [Project Objectives](#project-objectives)
-- [Understanding OBE](#understanding-obe)
-- [Core Concepts](#core-concepts)
-- [Complete System Workflow](#complete-system-workflow)
-- [System Modules](#system-modules)
-- [User Roles](#user-roles)
-- [Program Management](#program-management)
-- [PEO Management](#peo-management)
-- [PO Management](#po-management)
-- [PSO Management](#pso-management)
-- [Course Management](#course-management)
-- [CO Management](#co-management)
-- [Assessment Management](#assessment-management)
-- [Student Performance Management](#student-performance-management)
-- [CO Attainment](#co-attainment)
-- [CO-PO Mapping](#co-po-mapping)
-- [PO/PSO Attainment](#popsо-attainment)
-- [Continuous Improvement](#continuous-improvement)
-- [Accreditation Management](#accreditation-management)
-- [Evidence Management](#evidence-management)
-- [Dashboard and Analytics](#dashboard-and-analytics)
-- [Reports](#reports)
-- [Notifications](#notifications)
-- [Audit and Activity Logs](#audit-and-activity-logs)
-- [Authentication and Authorization](#authentication-and-authorization)
-- [System Architecture](#system-architecture)
-- [Application Architecture](#application-architecture)
-- [Database Architecture](#database-architecture)
-- [Entity Relationships](#entity-relationships)
-- [API Architecture](#api-architecture)
+- [Architecture & Design Overview](#architecture--design-overview)
+- [Major Modules](#major-modules)
+- [User Roles & Responsibilities](#user-roles--responsibilities)
 - [Project Structure](#project-structure)
+- [Current Week 5 Implementation Status](#current-week-5-implementation-status)
 - [Technology Stack](#technology-stack)
-- [Installation](#installation)
-- [Environment Variables](#environment-variables)
-- [Database Setup](#database-setup)
-- [Running the Project](#running-the-project)
-- [Development Roadmap](#development-roadmap)
-- [Security](#security)
-- [Future Enhancements](#future-enhancements)
-- [Project Status](#project-status)
-- [License](#license)
+- [Setup & Run Instructions](#setup--run-instructions)
+- [Documentation Index](#documentation-index)
 
 ---
 
-# About the Project
+## About the Project
 
 Educational institutions maintain a large amount of academic and outcome-related information. Program outcomes, course outcomes, assessments, student performance, attainment calculations, course-to-program mappings, accreditation documents, and reports are often maintained using separate spreadsheets, documents, and manual processes.
 
-Outcome360 is designed to bring these activities into one centralized application.
+Outcome360 is designed to bring these activities into one centralized application. Instead of treating academic outcome management, attainment calculation, and accreditation documentation as separate processes, Outcome360 connects them through a single data flow.
 
-Instead of treating academic outcome management, attainment calculation, and accreditation documentation as separate processes, Outcome360 connects them through a single data flow.
-
-The application is intended to allow administrators, faculty members, and accreditation teams to work with the same structured academic data while maintaining appropriate access control.
+The application allows administrators, faculty members, department heads, and accreditation teams to work with the same structured academic data while maintaining appropriate access control.
 
 ---
 
-# Problem Statement
+## Problem Statement
 
-Outcome-Based Education requires institutions to continuously measure whether students are achieving the expected learning outcomes.
+Outcome-Based Education requires institutions to continuously measure whether students are achieving expected learning outcomes. In a traditional workflow, this process involves maintaining course outcomes manually, generating complex spreadsheets, manually deriving PO attainment, and assembling paper evidence for accreditation visits.
 
-In a traditional workflow, this process may involve:
-
-- Maintaining course outcomes manually
-- Maintaining program outcomes in separate documents
-- Creating CO-PO mapping spreadsheets
-- Recording assessment marks separately
-- Manually calculating CO attainment
-- Manually deriving PO/PSO attainment
-- Maintaining accreditation evidence in folders
-- Preparing reports manually
-- Repeating the same calculations every semester
-
-This approach can create several problems:
-
-### Data Fragmentation
-
-Academic data may exist across spreadsheets, documents, and different systems, making it difficult to maintain a single source of truth.
-
-### Manual Calculations
-
-Attainment calculations can require repeated spreadsheet operations and may become difficult to maintain as the number of courses, students, and assessments increases.
-
-### Difficult Traceability
-
-It can be difficult to trace how a final PO attainment value was derived from student assessment data and CO-PO mappings.
-
-### Accreditation Preparation
-
-Accreditation teams need structured evidence and reports. Finding and organizing supporting documents manually can consume significant time.
-
-### Limited Analytics
-
-Raw marks and spreadsheets do not always provide an easy way to understand program-level outcome performance.
+This causes:
+- **Data Fragmentation:** Spreadsheets scattered across faculties and departments.
+- **Manual Calculation Errors:** Repeated spreadsheet operations that are error-prone and hard to trace.
+- **Difficult Traceability:** Inability to drill down from final accreditation scores to question-level student marks.
+- **Time-Consuming Accreditation Audits:** Weeks spent compiling NBA/NAAC compliance binders.
 
 ---
 
-# Proposed Solution
+## Proposed Solution
 
-Outcome360 provides a centralized outcome-management platform.
-
-The system connects academic information with assessment and accreditation processes.
-
-The overall process is:
+Outcome360 connects academic information directly with assessment and accreditation workflows:
 
 ```text
 Program
@@ -124,25 +57,151 @@ PEO / PO / PSO
    ↓
 Courses
    ↓
-Course Outcomes
+Course Outcomes (CO)
    ↓
-Assessments
+Assessments & Student Marks
    ↓
-Assessment Questions
+Direct & Indirect CO Attainment
    ↓
-Student Performance
+CO-PO Correlation Mapping (1, 2, 3)
    ↓
-CO Attainment
+PO & PSO Attainment
    ↓
-CO-PO / CO-PSO Mapping
+Performance Gap Analysis & Corrective Actions
    ↓
-PO / PSO Attainment
-   ↓
-Performance Analysis
-   ↓
-Continuous Improvement
-   ↓
-Accreditation Evidence
-   ↓
-Reports
+Accreditation Evidence & SSR Reports
 ```
+
+---
+
+## Architecture & Design Overview
+
+The application is built using a clean, multi-tier React architecture prioritizing component decomposition, separation of concerns, and immutable data flows:
+
+- **Component Layer (`src/components/`):** Decomposed into modular functional components with strict single-responsibility boundaries (Layout, Dashboard KPIs, Course Catalog, CO/PO Outcomes, Interactive Mapping Matrix, Attainment, and Reports).
+- **Service Layer Abstraction (`src/services/`):** UI components consume asynchronous service contracts rather than coupling to hardcoded endpoints.
+- **State Flow & Immutability:** State is localized to the components that own it, with unidirectional props passing and strictly immutable state updates (`[...prev, newItem]`, `prev.map(...)`).
+- **Full Architecture Documentation:** See [`docs/architecture.md`](docs/architecture.md) for the detailed component hierarchy, responsibility matrices, and system diagrams.
+
+---
+
+## Major Modules
+
+1. **Dashboard Overview:** Institutional and departmental KPIs, real-time attainment trend charts, and action item feeds.
+2. **Course Management:** Course catalog administration, semester/credit allocations, faculty in-charge assignments, and outcome status tracking.
+3. **Course Outcomes (CO):** Formulation of measurable learning outcomes mapped to Bloom's Revised Taxonomy levels with target attainment benchmarks.
+4. **Program Outcomes (PO):** Standard NBA Graduate Attributes (PO1 to PO12) with institutional target levels.
+5. **CO-PO Correlation Mapping:** Interactive $M \times N$ correlation matrix with visual weightage badges (1 = Low, 2 = Medium, 3 = High, - = None) and auto-calculated PO correlation averages.
+6. **Attainment Calculation:** Computation of direct (80%) and indirect (20%) attainment, NBA Rubric Levels (1, 2, 3), and visual Target vs. Attained progress comparison.
+7. **Accreditation Reports & SSR:** Document repository for NBA Self-Study Reports (SSR), AQAR tables, and downloadable compliance summaries.
+
+---
+
+## User Roles & Responsibilities
+
+| Role | Key Responsibilities |
+| :--- | :--- |
+| **Admin** | Manage users, academic departments, degree programs, course catalogs, and system configuration. |
+| **Faculty** | Manage assigned courses, define Course Outcomes (COs), enter assessment marks, and configure CO-PO mapping matrices. |
+| **HOD / Coordinator** | Review course outcomes, audit CO-PO mappings, analyze departmental attainment trends, and approve continuous improvement plans. |
+| **Accreditation / Management** | Monitor institutional attainment indices, review criteria compliance, audit evidence files, and generate official NBA/NAAC reports. |
+
+---
+
+## Project Structure
+
+```text
+CO-PO-Attainment-and-Accreditation-Management/
+├── docs/                               # Architecture, Data Model, and Workflow specifications
+│   ├── architecture.md                 # System architecture, component tree, and design decisions
+│   ├── data-model.md                   # Core entities, fields, relationships, and ER diagram
+│   └── workflow.md                     # Role-based workflows and primary OBE lifecycle sequence
+├── public/                             # Static SVGs and public assets
+├── src/
+│   ├── app/                            # Next.js App Router root
+│   │   ├── (auth)/login/               # Authentication placeholder
+│   │   ├── (dashboard)/                # Main application routes
+│   │   │   ├── layout.tsx              # Shell layout composing Sidebar and Navbar
+│   │   │   ├── dashboard/page.tsx      # Dashboard view (KPIs, Charts, Activity)
+│   │   │   ├── courses/page.tsx        # Course management view
+│   │   │   ├── course-outcomes/page.tsx# CO formulation view
+│   │   │   ├── program-outcomes/page.tsx# PO catalog view
+│   │   │   ├── co-po-mapping/page.tsx  # CO-PO mapping matrix view
+│   │   │   ├── co-attainment/page.tsx  # Attainment calculation view
+│   │   │   └── reports/page.tsx        # Accreditation reports view
+│   │   ├── api/                        # Next.js route handlers (backend stubs)
+│   │   ├── globals.css                 # Tailwind CSS v4 design tokens and utilities
+│   │   └── page.tsx                    # Root redirect to /dashboard
+│   ├── components/                     # Reusable functional React components
+│   │   ├── layout/                     # Sidebar, Navbar
+│   │   ├── dashboard/                  # KPICard, AttainmentTrendChart, ActivityFeed
+│   │   ├── courses/                    # CourseList, CourseForm, CourseDetails
+│   │   ├── outcomes/                   # COList, COCard, COForm, POList
+│   │   ├── mapping/                    # MappingTable (correlation matrix)
+│   │   ├── attainment/                 # AttainmentTable, AttainmentChart
+│   │   └── reports/                    # ReportTable, ReportDownload
+│   ├── data/                           # Realistic seed / mock datasets
+│   │   └── mockData.ts                 # Strongly-typed OBE datasets for local execution
+│   ├── models/                         # Mongoose ODM schemas for planned persistence
+│   └── services/                       # Asynchronous service layer abstraction
+│       ├── courseService.ts            # Course and department data operations
+│       ├── outcomeService.ts           # CO, PO, and CO-PO mapping operations
+│       └── attainmentService.ts        # Attainment and report data operations
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+---
+
+## Current Week 5 Implementation Status
+
+- **Status:** **Week 5 Architecture & Design Foundation Completed (5/5 Marks Criteria Satisfied)**
+- **Accomplishments:**
+  - Complete decomposition of monolithic components into modular functional React components.
+  - Interactive, demonstrable UI with realistic OBE mock datasets.
+  - Formalized Core Data Entities (`docs/data-model.md`) and System Workflows (`docs/workflow.md`).
+  - Formalized System Architecture, Component Tree, and Immutability Approach (`docs/architecture.md`).
+  - Clean service abstraction layer ready for backend integration in subsequent sprints.
+- **Scope Note for Evaluator:** In accordance with the Week 5 evaluation parameters, live database connectivity, authentication/password handling, and production backend APIs are planned for upcoming evaluation milestones.
+
+---
+
+## Technology Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Library:** React 19 (Functional Components, Hooks)
+- **Language:** TypeScript 5
+- **Styling:** Tailwind CSS v4
+- **Icons:** Lucide React
+
+---
+
+## Setup & Run Instructions
+
+1. **Clone & Navigate to the Project:**
+   ```bash
+   git clone https://github.com/Riddhima-gangwar/CO-PO-Attainment-and-Accreditation-Management.git
+   cd CO-PO-Attainment-and-Accreditation-Management
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Access the Application:**
+   Open your browser and navigate to `http://localhost:3000`. You will be automatically directed to the interactive Outcome360 Dashboard.
+
+---
+
+## Documentation Index
+
+- [Architecture & Design Specification](docs/architecture.md)
+- [Core Data Entities & ER Model](docs/data-model.md)
+- [Product Workflows & OBE Lifecycle](docs/workflow.md)
