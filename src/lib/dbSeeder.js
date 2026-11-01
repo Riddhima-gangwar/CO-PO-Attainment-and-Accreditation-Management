@@ -14,6 +14,7 @@ import { seedInitialPrograms } from '@/models/Program';
 import { seedInitialEvidence } from '@/models/EvidenceDocument';
 import { seedInitialCriteria } from '@/models/AccreditationCriterion';
 import { seedInitialReports } from '@/models/Report';
+import { seedInitialSettings } from '@/models/Settings';
 let hasSeeded = false;
 /**
  * Initializes and seeds all essential OBE collections into MongoDB
@@ -39,6 +40,7 @@ export async function ensureDatabaseSeeded() {
             seedInitialEvidence(),
             seedInitialCriteria(),
             seedInitialReports(),
+            seedInitialSettings(),
         ]);
         hasSeeded = true;
         console.log('[Database] All Outcome360 MongoDB collections initialized successfully.');
