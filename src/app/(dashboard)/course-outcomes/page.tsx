@@ -32,19 +32,30 @@ export default function CourseOutcomesPage() {
     }
   }, [selectedCourseId]);
 
-  // Immutable state update: Adding a Course Outcome
-  const handleAddCO = (newCoData: Omit<CourseOutcome, 'id'>) => {
-    const created: CourseOutcome = {
-      ...newCoData,
-      id: `co-${Date.now()}`,
-    };
-    setOutcomes((prev) => [...prev, created]);
-    setIsAddingCO(false);
+  // Adding a Course Outcome with MongoDB persistence
+  const handleAddCO = async (newCoData: Omit<CourseOutcome, 'id'>) => {
+    try {
+      const created = await outcomeService.addCO({
+        ...newCoData,
+        courseId: selectedCourseId,
+      });
+      setOutcomes((prev) => [...prev, created]);
+      setIsAddingCO(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to save CO';
+      alert(msg);
+    }
   };
 
-  // Immutable state update: Deleting a Course Outcome
-  const handleDeleteCO = (id: string) => {
-    setOutcomes((prev) => prev.filter((co) => co.id !== id));
+  // Deleting a Course Outcome with MongoDB persistence
+  const handleDeleteCO = async (id: string) => {
+    try {
+      await outcomeService.deleteCO(id);
+      setOutcomes((prev) => prev.filter((co) => co.id !== id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to delete CO';
+      alert(msg);
+    }
   };
 
   const currentCourse = courses.find((c) => c.id === selectedCourseId);
