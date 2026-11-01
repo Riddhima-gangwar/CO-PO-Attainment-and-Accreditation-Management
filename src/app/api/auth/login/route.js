@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase, getDbConnectionState } from '@/lib/mongodb';
 import { User, DEFAULT_USERS, seedDefaultUsers } from '@/models/User';
-import { verifyPassword, signSessionToken, AUTH_COOKIE_NAME } from '@/lib/auth';
+import { verifyPassword, signSessionToken, AUTH_COOKIE_NAME, SESSION_EXPIRATION_SECONDS } from '@/lib/auth';
 export async function POST(request) {
     try {
         const body = await request.json();
@@ -67,19 +67,23 @@ export async function POST(request) {
             role: foundUser.role,
             department: foundUser.department,
         });
-        // 4. Return success with HTTP-Only Cookie
+        // 4. Return success with HTTP-Only Cookie (15-Minute Expiration)
+        const expiresAt = Date.now() + SESSION_EXPIRATION_SECONDS * 1000;
         const response = NextResponse.json({
             success: true,
             message: `Successfully logged in as ${foundUser.name} (${foundUser.role})`,
             user: foundUser,
             token: sessionToken,
+            expiresIn: SESSION_EXPIRATION_SECONDS,
+            expiresAt,
             databaseStatus: getDbConnectionState(),
         });
         response.cookies.set(AUTH_COOKIE_NAME, sessionToken, {
             httpOnly: false, // Accessible to client-side auth state
             sameSite: 'lax',
             path: '/',
-            maxAge: 86400, // 24 hours
+            maxAge: SESSION_EXPIRATION_SECONDS, // 15 minutes (900s)
+            expires: new Date(expiresAt),
         });
         return response;
     }

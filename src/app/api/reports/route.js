@@ -40,7 +40,7 @@ export async function GET(request) {
 }
 export async function POST(request) {
     try {
-        const auth = authenticateRequest(request, ['Accreditation', 'HOD', 'Admin']);
+        const auth = authenticateRequest(request, ['Accreditation', 'HOD', 'Admin', 'Faculty']);
         if (!auth.authenticated) {
             return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
         }
@@ -77,6 +77,33 @@ export async function POST(request) {
     }
     catch (error) {
         const msg = error instanceof Error ? error.message : 'Error generating report';
+        return NextResponse.json({ success: false, error: msg }, { status: 500 });
+    }
+}
+
+export async function DELETE(request) {
+    try {
+        const auth = authenticateRequest(request, ['Accreditation', 'HOD', 'Admin', 'Faculty']);
+        if (!auth.authenticated) {
+            return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+        }
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+        if (!id) {
+            return NextResponse.json({ success: false, error: 'Report id is required' }, { status: 400 });
+        }
+        await ensureDatabaseSeeded();
+        const deleted = await Report.findByIdAndDelete(id);
+        if (!deleted) {
+            return NextResponse.json({ success: false, error: 'Report not found' }, { status: 404 });
+        }
+        return NextResponse.json({
+            success: true,
+            message: `Report '${deleted.title}' deleted successfully`,
+        });
+    }
+    catch (error) {
+        const msg = error instanceof Error ? error.message : 'Error deleting report';
         return NextResponse.json({ success: false, error: msg }, { status: 500 });
     }
 }

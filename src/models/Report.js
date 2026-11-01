@@ -41,9 +41,9 @@ const ReportSchema = new Schema({
 });
 export const Report = mongoose.models.Report || mongoose.model('Report', ReportSchema);
 export async function seedInitialReports() {
-    const count = await Report.countDocuments();
-    if (count === 0) {
-        for (const r of mockReports) {
+    for (const r of mockReports) {
+        const existing = await Report.findOne({ title: r.title });
+        if (!existing) {
             await Report.create({
                 title: r.title,
                 type: r.type,
@@ -54,6 +54,6 @@ export async function seedInitialReports() {
                 fileSize: r.fileSize,
             });
         }
-        console.log('[Seed] Seeded initial reports into MongoDB');
     }
+    console.log('[Seed] Verified and seeded unique reports into MongoDB');
 }

@@ -2,20 +2,95 @@ import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectToDatabase } from '@/lib/mongodb';
 import { CO } from '@/models/CO';
+import { Course } from '@/models/Course';
+import { COPOMap } from '@/models/COPOMap';
 import { ensureDatabaseSeeded } from '@/lib/dbSeeder';
 import { authenticateRequest } from '@/lib/auth';
 import { mockCourseOutcomes } from '@/data/mockData';
+
 const VALID_BLOOM_LEVELS = ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'];
+
+function naturalSortCOs(list) {
+    return [...list].sort((a, b) => {
+        const numA = parseInt(a.code.replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(b.code.replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+    });
+}
+
 export async function GET(request) {
+    let possibleCourseIds = [];
     try {
         const { searchParams } = new URL(request.url);
         const courseId = searchParams.get('courseId');
         let cosList = [];
+
+        if (courseId) {
+            possibleCourseIds.push(courseId);
+        }
+
         try {
             await ensureDatabaseSeeded();
-            const query = courseId ? { courseId } : {};
-            const docs = await CO.find(query).sort({ code: 1 });
-            cosList = docs.map((d) => ({
+            await connectToDatabase();
+
+            if (courseId) {
+                let course = null;
+                if (mongoose.Types.ObjectId.isValid(courseId)) {
+                    course = await Course.findById(courseId);
+                }
+                if (!course) {
+                    course = await Course.findOne({
+                        $or: [{ code: courseId.toUpperCase() }, { id: courseId }]
+                    });
+                }
+
+                if (course) {
+                    possibleCourseIds.push(course._id.toString(), course.code, course.code.toUpperCase());
+                    const legacyMap = { 'CS301': 'crs-1', 'CS302': 'crs-2', 'CS401': 'crs-3', 'EC305': 'crs-4' };
+                    if (legacyMap[course.code]) possibleCourseIds.push(legacyMap[course.code]);
+                } else {
+                    const legacyReverse = { 'crs-1': 'CS301', 'crs-2': 'CS302', 'crs-3': 'CS401', 'crs-4': 'EC305' };
+                    if (legacyReverse[courseId]) possibleCourseIds.push(legacyReverse[courseId]);
+                }
+            }
+
+            const query = courseId ? { courseId: { $in: possibleCourseIds } } : {};
+            let docs = await CO.find(query);
+
+            // If this course has no COs in DB yet, auto-seed from mockCourseOutcomes into MongoDB
+            if (courseId && docs.length === 0) {
+                const matchMocks = mockCourseOutcomes.filter(co => possibleCourseIds.includes(co.courseId));
+                if (matchMocks.length > 0) {
+                    for (const m of matchMocks) {
+                        try {
+                            const created = await CO.create({
+                                courseId: courseId,
+                                code: m.code,
+                                statement: m.statement,
+                                bloomLevel: m.bloomLevel,
+                                targetAttainment: m.targetAttainment,
+                                actualAttainment: m.actualAttainment,
+                            });
+                            docs.push(created);
+                        } catch {
+                            // Ignore race conditions
+                        }
+                    }
+                }
+            }
+
+            // Deduplicate by code so each CO (CO1, CO2, etc.) appears exactly once
+            const seenCodes = new Set();
+            const uniqueDocs = [];
+            for (const doc of docs) {
+                const norm = doc.code.toUpperCase();
+                if (!seenCodes.has(norm)) {
+                    seenCodes.add(norm);
+                    uniqueDocs.push(doc);
+                }
+            }
+
+            cosList = naturalSortCOs(uniqueDocs).map((d) => ({
                 id: d._id.toString(),
                 courseId: d.courseId,
                 code: d.code,
@@ -27,10 +102,21 @@ export async function GET(request) {
         }
         catch {
             // Fallback to mock
-            cosList = courseId
-                ? mockCourseOutcomes.filter((co) => co.courseId === courseId)
+            const fallbackList = courseId
+                ? mockCourseOutcomes.filter((co) => possibleCourseIds.includes(co.courseId))
                 : mockCourseOutcomes;
+            const seenMockCodes = new Set();
+            const uniqueMocks = [];
+            for (const m of fallbackList) {
+                const norm = m.code.toUpperCase();
+                if (!seenMockCodes.has(norm)) {
+                    seenMockCodes.add(norm);
+                    uniqueMocks.push(m);
+                }
+            }
+            cosList = naturalSortCOs(uniqueMocks);
         }
+
         return NextResponse.json({
             success: true,
             count: cosList.length,
@@ -73,6 +159,17 @@ export async function POST(request) {
             bloomLevel,
             targetAttainment: Number(targetAttainment),
         });
+
+        // Update coCount on the corresponding course
+        try {
+            const courseQuery = mongoose.Types.ObjectId.isValid(courseId)
+                ? { _id: courseId }
+                : { $or: [{ code: courseId.toUpperCase() }, { id: courseId }] };
+            await Course.updateOne(courseQuery, { $inc: { coCount: 1 } });
+        } catch {
+            // Non-critical
+        }
+
         return NextResponse.json({
             success: true,
             message: 'Course outcome formulated and persisted successfully',
@@ -108,6 +205,20 @@ export async function DELETE(request) {
         if (!deleted) {
             return NextResponse.json({ success: false, error: 'CO not found' }, { status: 404 });
         }
+
+        // Clean up mappings associated with this CO
+        try {
+            await COPOMap.deleteMany({
+                $or: [{ coId: deleted._id.toString() }, { coId: deleted.code }, { coId: id }]
+            });
+            const courseQuery = mongoose.Types.ObjectId.isValid(deleted.courseId)
+                ? { _id: deleted.courseId }
+                : { $or: [{ code: deleted.courseId.toUpperCase() }, { id: deleted.courseId }] };
+            await Course.updateOne(courseQuery, { $inc: { coCount: -1 } });
+        } catch {
+            // Non-critical
+        }
+
         return NextResponse.json({
             success: true,
             message: `Course Outcome ${deleted.code} deleted successfully`,

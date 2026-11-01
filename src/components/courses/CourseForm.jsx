@@ -40,14 +40,14 @@ export const CourseForm = ({ onSubmit, onCancel }) => {
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
               Course Code *
             </label>
-            <input type="text" required placeholder="e.g. CS305" value={code} onChange={(e) => setCode(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            <input type="text" required placeholder="e.g. CS305" value={code} onChange={(e) => setCode(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
               Course Title *
             </label>
-            <input type="text" required placeholder="e.g. Operating Systems" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            <input type="text" required placeholder="e.g. Operating Systems" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export const CourseForm = ({ onSubmit, onCancel }) => {
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
               Department
             </label>
-            <select value={departmentName} onChange={(e) => setDepartmentName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select value={departmentName} onChange={(e) => setDepartmentName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs">
               <option>Computer Science & Engineering</option>
               <option>Electronics & Communication</option>
               <option>Mechanical Engineering</option>
@@ -67,14 +67,14 @@ export const CourseForm = ({ onSubmit, onCancel }) => {
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
               Semester
             </label>
-            <input type="number" min={1} max={8} value={semester} onChange={(e) => setSemester(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            <input type="number" min={1} max={8} value={semester} onChange={(e) => setSemester(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
               Credits
             </label>
-            <input type="number" min={1} max={6} value={credits} onChange={(e) => setCredits(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            <input type="number" min={1} max={6} value={credits} onChange={(e) => setCredits(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
           </div>
         </div>
 
@@ -82,7 +82,7 @@ export const CourseForm = ({ onSubmit, onCancel }) => {
           <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
             Course Incharge / Faculty
           </label>
-          <input type="text" placeholder="e.g. Dr. Rajesh Khanna" value={facultyName} onChange={(e) => setFacultyName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          <input type="text" placeholder="e.g. Dr. Rajesh Khanna" value={facultyName} onChange={(e) => setFacultyName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 font-medium placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">

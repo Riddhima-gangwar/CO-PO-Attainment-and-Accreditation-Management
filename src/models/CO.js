@@ -41,9 +41,9 @@ const COSchema = new Schema({
 COSchema.index({ courseId: 1, code: 1 }, { unique: true });
 export const CO = mongoose.models.CO || mongoose.model('CO', COSchema);
 export async function seedInitialCOs() {
-    const count = await CO.countDocuments();
-    if (count === 0) {
-        for (const co of mockCourseOutcomes) {
+    for (const co of mockCourseOutcomes) {
+        const existing = await CO.findOne({ courseId: co.courseId, code: co.code });
+        if (!existing) {
             await CO.create({
                 courseId: co.courseId,
                 code: co.code,
@@ -53,6 +53,6 @@ export async function seedInitialCOs() {
                 actualAttainment: co.actualAttainment,
             });
         }
-        console.log('[Seed] Seeded initial Course Outcomes into MongoDB');
     }
+    console.log('[Seed] Verified and seeded initial Course Outcomes into MongoDB');
 }

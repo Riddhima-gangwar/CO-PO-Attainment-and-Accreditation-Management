@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 export const USER_ROLES = [
     {
         id: 'Admin',
@@ -26,25 +27,32 @@ export const USER_ROLES = [
     },
 ];
 export const AUTH_COOKIE_NAME = 'outcome360_session';
+export const SESSION_EXPIRATION_SECONDS = 15 * 60; // 15 minutes in seconds (900s)
 const JWT_SECRET = process.env.JWT_SECRET || 'outcome360_super_secret_jwt_key_2026_accreditation_management';
 /**
- * Hash a plain password using PBKDF2 with a cryptographic salt
+ * Hash a plain password using bcrypt with salt (10 rounds)
  */
 export function hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-    return `${salt}:${hash}`;
+    const salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
 }
 /**
- * Verify plain password against stored salt:hash string
+ * Verify plain password against stored bcrypt hash (with PBKDF2 fallback)
  */
 export function verifyPassword(password, storedHash) {
     try {
+        if (!storedHash) return false;
+        // Standard bcrypt format ($2a$, $2b$, $2y$)
+        if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$') || storedHash.startsWith('$2y$')) {
+            return bcrypt.compareSync(password, storedHash);
+        }
+        // Fallback for legacy salt:hash format
         const [salt, key] = storedHash.split(':');
-        if (!salt || !key)
-            return false;
-        const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-        return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(key, 'hex'));
+        if (salt && key) {
+            const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+            return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(key, 'hex'));
+        }
+        return false;
     }
     catch {
         return false;
@@ -65,11 +73,11 @@ function base64UrlDecode(str) {
     return Buffer.from(base64, 'base64').toString('utf8');
 }
 /**
- * Sign a lightweight JWT session token
+ * Sign a lightweight HMAC-SHA256 JWT session token with a 15-minute expiration
  */
-export function signSessionToken(payload, expiresInHours = 24) {
+export function signSessionToken(payload, expiresInSeconds = SESSION_EXPIRATION_SECONDS) {
     const iat = Math.floor(Date.now() / 1000);
-    const exp = iat + expiresInHours * 3600;
+    const exp = iat + expiresInSeconds;
     const fullPayload = { ...payload, iat, exp };
     const header = { alg: 'HS256', typ: 'JWT' };
     const encodedHeader = base64UrlEncode(JSON.stringify(header));
@@ -84,10 +92,12 @@ export function signSessionToken(payload, expiresInHours = 24) {
     return `${encodedHeader}.${encodedPayload}.${signature}`;
 }
 /**
- * Verify and decode a JWT session token
+ * Verify and decode a JWT session token. Rejects expired or tampered tokens.
  */
 export function verifySessionToken(token) {
     try {
+        if (!token || typeof token !== 'string')
+            return null;
         const parts = token.split('.');
         if (parts.length !== 3)
             return null;
@@ -100,11 +110,12 @@ export function verifySessionToken(token) {
             .replace(/\+/g, '-')
             .replace(/\//g, '_');
         if (signature !== expectedSig) {
-            return null;
+            return null; // Signature mismatch / tampered token
         }
         const decoded = JSON.parse(base64UrlDecode(payload));
+        // Strict expiration verification
         if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-            return null; // Expired
+            return null; // Expired (past 15-minute validity window)
         }
         return decoded;
     }

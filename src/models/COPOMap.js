@@ -32,12 +32,18 @@ const COPOMapSchema = new Schema({
 COPOMapSchema.index({ courseId: 1, coId: 1, poId: 1 }, { unique: true });
 export const COPOMap = mongoose.models.COPOMap || mongoose.model('COPOMap', COPOMapSchema);
 export async function seedInitialMappings() {
-    const count = await COPOMap.countDocuments();
-    if (count === 0) {
-        const courseId = 'crs-1';
-        for (const [key, level] of Object.entries(initialCourseMapping)) {
-            const [coId, poId] = key.split('_');
-            if (coId && poId) {
+    for (const [key, level] of Object.entries(initialCourseMapping)) {
+        const [coId, poId] = key.split('_');
+        if (coId && poId && level > 0) {
+            // Determine corresponding courseId
+            let courseId = 'crs-1';
+            const coNum = parseInt(coId.replace(/\D/g, ''), 10);
+            if (coNum >= 6 && coNum <= 10) courseId = 'crs-2';
+            else if (coNum >= 11 && coNum <= 14) courseId = 'crs-3';
+            else if (coNum >= 15 && coNum <= 19) courseId = 'crs-4';
+
+            const existing = await COPOMap.findOne({ courseId, coId, poId });
+            if (!existing) {
                 await COPOMap.create({
                     courseId,
                     coId,
@@ -46,6 +52,6 @@ export async function seedInitialMappings() {
                 });
             }
         }
-        console.log('[Seed] Seeded initial CO-PO mappings into MongoDB');
     }
+    console.log('[Seed] Verified and seeded initial CO-PO mappings into MongoDB');
 }

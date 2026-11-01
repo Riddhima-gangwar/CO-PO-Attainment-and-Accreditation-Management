@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase, getDbConnectionState } from '@/lib/mongodb';
 import { User } from '@/models/User';
-import { hashPassword, signSessionToken, AUTH_COOKIE_NAME, USER_ROLES } from '@/lib/auth';
+import { hashPassword, signSessionToken, AUTH_COOKIE_NAME, USER_ROLES, SESSION_EXPIRATION_SECONDS } from '@/lib/auth';
 export async function POST(request) {
     try {
         const body = await request.json();
@@ -51,18 +51,22 @@ export async function POST(request) {
             role: userPayload.role,
             department: userPayload.department,
         });
+        const expiresAt = Date.now() + SESSION_EXPIRATION_SECONDS * 1000;
         const response = NextResponse.json({
             success: true,
             message: `User created successfully as ${role}`,
             user: userPayload,
             token,
+            expiresIn: SESSION_EXPIRATION_SECONDS,
+            expiresAt,
             database: getDbConnectionState(),
         });
         response.cookies.set(AUTH_COOKIE_NAME, token, {
             httpOnly: false,
             sameSite: 'lax',
             path: '/',
-            maxAge: 86400,
+            maxAge: SESSION_EXPIRATION_SECONDS, // 15 minutes (900s)
+            expires: new Date(expiresAt),
         });
         return response;
     }

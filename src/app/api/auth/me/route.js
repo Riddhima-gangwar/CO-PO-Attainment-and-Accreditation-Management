@@ -19,6 +19,7 @@ export async function GET(request) {
             return NextResponse.json({
                 authenticated: false,
                 user: null,
+                reason: 'missing_token',
                 database: getDbConnectionState(),
             });
         }
@@ -27,9 +28,12 @@ export async function GET(request) {
             return NextResponse.json({
                 authenticated: false,
                 user: null,
+                reason: 'expired_or_invalid',
                 database: getDbConnectionState(),
             });
         }
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        const expiresIn = Math.max(0, (session.exp || nowSeconds) - nowSeconds);
         return NextResponse.json({
             authenticated: true,
             user: {
@@ -39,6 +43,10 @@ export async function GET(request) {
                 role: session.role,
                 department: session.department,
             },
+            exp: session.exp,
+            iat: session.iat,
+            expiresIn,
+            expiresAt: session.exp ? session.exp * 1000 : null,
             database: getDbConnectionState(),
         });
     }
