@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { StudentMark } from '@/models/StudentMark';
 import { COAttainment } from '@/models/COAttainment';
+import { Settings } from '@/models/Settings';
 import { ensureDatabaseSeeded } from '@/lib/dbSeeder';
 import { authenticateRequest } from '@/lib/auth';
 export async function GET(request) {
@@ -67,23 +68,30 @@ export async function POST(request) {
             }, { upsert: true, new: true });
         }
         // 2. Real-time Attainment Recalculation Engine for Course Outcomes
-        // NBA Rubric Threshold: calculate % of students scoring >= 60% of marks for each CO
+        const currentSettings = await Settings.findOne({ key: 'institutional_parameters' }).catch(() => null);
+        const directRatio = (currentSettings?.directAssessmentWeightage ?? 80) / 100;
+        const indirectRatio = (currentSettings?.indirectSurveyWeightage ?? 20) / 100;
+        const passBenchmark = currentSettings?.passingBenchmark ?? 60;
+        const threshL3 = currentSettings?.level3Threshold ?? 70;
+        const threshL2 = currentSettings?.level2Threshold ?? 60;
+        const threshL1 = currentSettings?.level1Threshold ?? 50;
+
         const coCodes = Array.from(new Set(marks.map((m) => m.coCode)));
         for (const co of coCodes) {
             const allCoMarks = await StudentMark.find({ courseId, coCode: co });
             if (allCoMarks.length > 0) {
-                const thresholdMarksCount = allCoMarks.filter((record) => (record.percentage || 0) >= 60).length;
+                const thresholdMarksCount = allCoMarks.filter((record) => (record.percentage || 0) >= passBenchmark).length;
                 const directPercent = Math.round((thresholdMarksCount / allCoMarks.length) * 1000) / 10;
-                // Composite calculation: 80% Direct + 20% Indirect survey (default 75% for indirect)
+                // Composite calculation using configured direct & indirect survey weights
                 const indirectScore = 78.0;
-                const totalAttainment = Math.round((0.8 * directPercent + 0.2 * indirectScore) * 10) / 10;
-                // Level derivation: Level 3 (>=70%), Level 2 (60-69%), Level 1 (50-59%), Level 0 (<50%)
+                const totalAttainment = Math.round((directRatio * directPercent + indirectRatio * indirectScore) * 10) / 10;
+                // Level derivation from configured institutional thresholds
                 let level = 0;
-                if (totalAttainment >= 70)
+                if (totalAttainment >= threshL3)
                     level = 3;
-                else if (totalAttainment >= 60)
+                else if (totalAttainment >= threshL2)
                     level = 2;
-                else if (totalAttainment >= 50)
+                else if (totalAttainment >= threshL1)
                     level = 1;
                 const targetPercent = 65;
                 const status = totalAttainment >= targetPercent ? 'Met' : 'Unmet';
