@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, CheckCircle2, AlertCircle, User as UserIcon, Building2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -52,6 +52,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('expired') === 'true') {
+        setSessionExpiredNotice(true);
+      }
+    }
+  }, []);
 
   const handleRoleSelect = (role) => {
     setActiveRole(role);
@@ -214,6 +224,16 @@ export default function LoginPage() {
         </div>
 
         {/* Feedback alerts */}
+        {sessionExpiredNotice && (
+          <div className="mb-3.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5 shadow-2xs">
+            <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+            <div>
+              <div className="font-semibold text-amber-900">Session Expired (15 Minutes)</div>
+              <div className="text-[11px] text-amber-700">You were automatically logged out for security. Please sign in again.</div>
+            </div>
+          </div>
+        )}
+
         {errorMessage && (
           <div className="mb-3.5 p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
@@ -482,7 +502,7 @@ export default function LoginPage() {
         <div className="mt-5 text-center">
           <span className="inline-flex items-center gap-1.5 text-[10px] text-gray-400 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            MongoDB connected • bcrypt salt hashing enabled
+            MongoDB connected • 15m session security • bcrypt salt enabled
           </span>
         </div>
       </div>
