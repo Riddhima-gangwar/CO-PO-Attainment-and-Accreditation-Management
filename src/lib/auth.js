@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 export const USER_ROLES = [
     {
         id: 'Admin',
@@ -28,23 +29,29 @@ export const USER_ROLES = [
 export const AUTH_COOKIE_NAME = 'outcome360_session';
 const JWT_SECRET = process.env.JWT_SECRET || 'outcome360_super_secret_jwt_key_2026_accreditation_management';
 /**
- * Hash a plain password using PBKDF2 with a cryptographic salt
+ * Hash a plain password using bcrypt with salt (10 rounds)
  */
 export function hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-    return `${salt}:${hash}`;
+    const salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
 }
 /**
- * Verify plain password against stored salt:hash string
+ * Verify plain password against stored bcrypt hash (with PBKDF2 fallback)
  */
 export function verifyPassword(password, storedHash) {
     try {
+        if (!storedHash) return false;
+        // Standard bcrypt format ($2a$, $2b$, $2y$)
+        if (storedHash.startsWith('$2a$') || storedHash.startsWith('$2b$') || storedHash.startsWith('$2y$')) {
+            return bcrypt.compareSync(password, storedHash);
+        }
+        // Fallback for legacy salt:hash format
         const [salt, key] = storedHash.split(':');
-        if (!salt || !key)
-            return false;
-        const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-        return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(key, 'hex'));
+        if (salt && key) {
+            const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+            return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(key, 'hex'));
+        }
+        return false;
     }
     catch {
         return false;

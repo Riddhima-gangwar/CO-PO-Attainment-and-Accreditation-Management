@@ -62,6 +62,30 @@ export const AuthProvider = ({ children }) => {
             setIsLoading(false);
         }
     };
+    const register = async ({ name, email, password, role, department, designation }) => {
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, role, department, designation }),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+                return { success: false, error: data.error || 'Registration failed' };
+            }
+            setUser(data.user);
+            localStorage.setItem('outcome360_user', JSON.stringify(data.user));
+            return { success: true, user: data.user };
+        }
+        catch (err) {
+            const msg = err instanceof Error ? err.message : 'Network error during registration';
+            return { success: false, error: msg };
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
     const logout = async () => {
         try {
             await fetch('/api/auth/logout', { method: 'POST' });
@@ -90,6 +114,7 @@ export const AuthProvider = ({ children }) => {
             isAuthenticated: !!user,
             isLoading,
             login,
+            register,
             logout,
             setUserFromClient,
         }}>
