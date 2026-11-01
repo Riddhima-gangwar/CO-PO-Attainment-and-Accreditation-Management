@@ -97,8 +97,11 @@ export async function seedInitialEvidence() {
             },
         ];
         for (const e of defaultEvidence) {
-            await EvidenceDocument.create(e);
+            const existing = await EvidenceDocument.findOne({ title: e.title });
+            if (!existing) {
+                await EvidenceDocument.create(e);
+            }
         }
-        console.log('[Seed] Seeded initial evidence documents into MongoDB');
+        console.log('[Seed] Verified and seeded unique evidence documents into MongoDB');
     }
 }

@@ -2,13 +2,22 @@ import { NextResponse } from 'next/server';
 import { PO } from '@/models/PO';
 import { ensureDatabaseSeeded } from '@/lib/dbSeeder';
 import { mockProgramOutcomes } from '@/data/mockData';
+function naturalSortPOs(list) {
+    return [...list].sort((a, b) => {
+        const numA = parseInt(a.code.replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(b.code.replace(/\D/g, ''), 10) || 0;
+        return numA - numB;
+    });
+}
+
 export async function GET() {
     try {
         let posList = [];
         try {
             await ensureDatabaseSeeded();
-            const docs = await PO.find().sort({ code: 1 });
-            posList = docs.map((d) => ({
+            const docs = await PO.find();
+            const sortedDocs = naturalSortPOs(docs);
+            posList = sortedDocs.map((d) => ({
                 id: d._id.toString(),
                 code: d.code,
                 title: d.title,
@@ -17,7 +26,7 @@ export async function GET() {
             }));
         }
         catch {
-            posList = mockProgramOutcomes;
+            posList = naturalSortPOs(mockProgramOutcomes);
         }
         return NextResponse.json({
             success: true,

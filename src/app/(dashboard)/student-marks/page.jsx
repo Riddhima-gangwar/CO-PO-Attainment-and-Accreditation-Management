@@ -154,7 +154,7 @@ export default function StudentMarksPage() {
                   <td className="px-6 py-3.5 font-mono text-xs font-bold text-gray-900">{s.roll}</td>
                   <td className="px-6 py-3.5 text-xs font-medium text-gray-800">{s.name}</td>
                   {['CO1', 'CO2', 'CO3', 'CO4', 'CO5'].map((co) => (<td key={co} className="px-4 py-3.5 text-center">
-                      <input type="number" min="0" max="25" value={s.marks[co] ?? ''} onChange={(e) => handleMarkChange(s.roll, co, e.target.value)} className="w-16 text-center py-1 px-2 border border-gray-200 rounded-md text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                      <input type="number" min="0" max="25" value={s.marks[co] ?? ''} onChange={(e) => handleMarkChange(s.roll, co, e.target.value)} className="w-16 text-center py-1 px-2 border border-gray-300 bg-white rounded-md text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"/>
                     </td>))}
                   <td className="px-6 py-3.5 text-center font-bold text-xs text-blue-700">
                     {avg} / 25

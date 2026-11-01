@@ -286,7 +286,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
-                  className="w-full h-11 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                  className="w-full h-11 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
                 />
               </div>
 
@@ -301,7 +301,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="w-full h-11 pl-10 pr-10 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                  className="w-full h-11 pl-10 pr-10 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
                 />
                 <button
                   type="button"
@@ -404,7 +404,7 @@ export default function LoginPage() {
                 value={regName}
                 onChange={(e) => setRegName(e.target.value)}
                 placeholder="Full Name (e.g. Dr. Jane Doe)"
-                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
               />
             </div>
 
@@ -419,7 +419,7 @@ export default function LoginPage() {
                 value={regEmail}
                 onChange={(e) => setRegEmail(e.target.value)}
                 placeholder="Institutional Email"
-                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
               />
             </div>
 
@@ -434,7 +434,7 @@ export default function LoginPage() {
                 value={regPassword}
                 onChange={(e) => setRegPassword(e.target.value)}
                 placeholder="Password (bcrypt hashed with salt)"
-                className="w-full h-10 pl-10 pr-10 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                className="w-full h-10 pl-10 pr-10 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
               />
               <button
                 type="button"
@@ -479,7 +479,7 @@ export default function LoginPage() {
                 value={regDept}
                 onChange={(e) => setRegDept(e.target.value)}
                 placeholder="Department"
-                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-800 text-xs rounded-xl border-0 focus:outline-none focus:ring-2 focus:ring-gray-300 placeholder-gray-400 font-normal transition-all"
+                className="w-full h-10 pl-10 pr-3.5 bg-[#F1F4F9] text-gray-900 text-xs font-medium rounded-xl border border-transparent focus:border-gray-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400 transition-all"
               />
             </div>
 

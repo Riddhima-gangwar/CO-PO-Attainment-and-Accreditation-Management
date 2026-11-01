@@ -105,6 +105,25 @@ export const attainmentService = {
             fileSize: '2.8 MB',
         });
     },
+    async deleteReport(id) {
+        try {
+            if (typeof window !== 'undefined') {
+                const res = await fetch(`/api/reports?id=${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                });
+                const json = await res.json();
+                if (!res.ok || !json.success) {
+                    throw new Error(json.error || 'Failed to delete report');
+                }
+                return true;
+            }
+        }
+        catch (err) {
+            console.warn('API delete report failed:', err);
+            throw err;
+        }
+        return Promise.resolve(true);
+    },
     async getAssessments(courseId) {
         try {
             if (typeof window !== 'undefined') {
