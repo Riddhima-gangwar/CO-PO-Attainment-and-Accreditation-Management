@@ -1,8 +1,76 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
+import { mockCourseOutcomes } from '@/data/mockData';
 
-const COSchema = new mongoose.Schema({
-  // Placeholder fields
-  createdAt: { type: Date, default: Date.now }
-});
+export interface ICO extends Document {
+  courseId: string;
+  code: string;
+  statement: string;
+  bloomLevel: 'Remember' | 'Understand' | 'Apply' | 'Analyze' | 'Evaluate' | 'Create';
+  targetAttainment: number;
+  actualAttainment?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export const CO = mongoose.models.CO || mongoose.model('CO', COSchema);
+const COSchema = new Schema<ICO>(
+  {
+    courseId: {
+      type: String,
+      required: [true, 'Course ID is required'],
+      index: true,
+    },
+    code: {
+      type: String,
+      required: [true, 'CO code is required'],
+      uppercase: true,
+      trim: true,
+    },
+    statement: {
+      type: String,
+      required: [true, 'CO statement is required'],
+      trim: true,
+    },
+    bloomLevel: {
+      type: String,
+      enum: ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'],
+      required: true,
+      default: 'Apply',
+    },
+    targetAttainment: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+      default: 70,
+    },
+    actualAttainment: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+COSchema.index({ courseId: 1, code: 1 }, { unique: true });
+
+export const CO: Model<ICO> = mongoose.models.CO || mongoose.model<ICO>('CO', COSchema);
+
+export async function seedInitialCOs() {
+  const count = await CO.countDocuments();
+  if (count === 0) {
+    for (const co of mockCourseOutcomes) {
+      await CO.create({
+        courseId: co.courseId,
+        code: co.code,
+        statement: co.statement,
+        bloomLevel: co.bloomLevel,
+        targetAttainment: co.targetAttainment,
+        actualAttainment: co.actualAttainment,
+      });
+    }
+    console.log('[Seed] Seeded initial Course Outcomes into MongoDB');
+  }
+}

@@ -10,10 +10,37 @@ import { FileText, Plus, ShieldCheck, CheckCircle2, LayoutDashboard, ArrowLeft }
 export default function ReportsPage() {
   const [reports, setReports] = useState<ReportItem[]>([]);
   const [selectedType, setSelectedType] = useState('All');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [type, setType] = useState('NBA SSR');
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchReports = () => {
+    attainmentService.getReports().then((data) => setReports(data));
+  };
 
   useEffect(() => {
-    attainmentService.getReports().then((data) => setReports(data));
+    fetchReports();
   }, []);
+
+  const handleGenerateReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await attainmentService.generateReport({
+        title,
+        type,
+        department: 'Computer Science & Engineering',
+      });
+      setIsModalOpen(false);
+      setTitle('');
+      fetchReports();
+    } catch (err: unknown) {
+      alert('Error generating report');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const filteredReports =
     selectedType === 'All'
@@ -33,7 +60,10 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <button className="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-colors text-sm font-medium flex items-center gap-2 shadow-blue-500/20">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition-colors text-sm font-medium flex items-center gap-2 shadow-blue-500/20"
+        >
           <Plus className="h-4 w-4" /> Generate New Report
         </button>
       </div>
@@ -84,6 +114,63 @@ export default function ReportsPage() {
           </Link>
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Generate Compliance Report</h2>
+            <p className="text-xs text-gray-500 mb-4">
+              Compile outcome calculation tables and evidence for official submission
+            </p>
+
+            <form onSubmit={handleGenerateReport} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Report Title</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. NBA Tier-I SSR Criterion 3.2 Evaluation"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Report Format</label>
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                >
+                  <option value="NBA SSR">NBA Tier-I Self Study Report (SSR)</option>
+                  <option value="Attainment Register">Direct & Indirect Attainment Register</option>
+                  <option value="Course Exit Survey">Course Exit Feedback Summary</option>
+                  <option value="NAAC Criterion">NAAC AQAR Criterion 2 Table</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg text-xs font-semibold hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {submitting ? 'Generating...' : 'Compile Report'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

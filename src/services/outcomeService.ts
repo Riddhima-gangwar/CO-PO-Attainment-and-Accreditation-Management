@@ -9,26 +9,134 @@ import {
 /**
  * Outcome Service Abstraction Layer
  * Encapsulates operations for COs, POs, and CO-PO Correlation Mapping matrices.
+ * Connects directly to Next.js API route handlers backed by MongoDB.
  */
 export const outcomeService = {
   async getCOs(courseId?: string): Promise<CourseOutcome[]> {
+    try {
+      if (typeof window !== 'undefined') {
+        const url = courseId ? `/api/co?courseId=${encodeURIComponent(courseId)}` : '/api/co';
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.data)) {
+            return json.data;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('API fetch for COs failed, falling back:', err);
+    }
+
     if (!courseId) return Promise.resolve([...mockCourseOutcomes]);
-    return Promise.resolve(mockCourseOutcomes.filter(co => co.courseId === courseId));
+    return Promise.resolve(mockCourseOutcomes.filter((co) => co.courseId === courseId));
+  },
+
+  async addCO(newCO: Omit<CourseOutcome, 'id'>): Promise<CourseOutcome> {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch('/api/co', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newCO),
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || 'Failed to formulate CO');
+        }
+        return json.data;
+      }
+    } catch (err) {
+      console.warn('API POST CO failed:', err);
+      throw err;
+    }
+
+    const created: CourseOutcome = {
+      ...newCO,
+      id: `co-${Date.now()}`,
+    };
+    return Promise.resolve(created);
+  },
+
+  async deleteCO(id: string): Promise<boolean> {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch(`/api/co?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || 'Failed to delete CO');
+        }
+        return true;
+      }
+    } catch (err) {
+      console.warn('API DELETE CO failed:', err);
+      throw err;
+    }
+    return true;
   },
 
   async getPOs(): Promise<ProgramOutcome[]> {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch('/api/po', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && Array.isArray(json.data)) {
+            return json.data;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('API fetch for POs failed, falling back:', err);
+    }
+
     return Promise.resolve([...mockProgramOutcomes]);
   },
 
   async getMapping(courseId: string): Promise<Record<string, number>> {
-    // Return cloned mapping to maintain immutability
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch(`/api/mappings?courseId=${encodeURIComponent(courseId)}`, {
+          cache: 'no-store',
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.data) {
+            return json.data;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('API fetch for mapping failed, falling back:', err);
+    }
+
     return Promise.resolve({ ...initialCourseMapping });
   },
 
   async updateMapping(
     courseId: string,
     mappings: Record<string, number>
-  ): Promise<{ success: boolean }> {
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      if (typeof window !== 'undefined') {
+        const res = await fetch('/api/mappings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courseId, mappings }),
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+          throw new Error(json.error || 'Failed to save mapping matrix');
+        }
+        return { success: true, message: json.message };
+      }
+    } catch (err) {
+      console.warn('API update mapping failed:', err);
+      throw err;
+    }
+
     return Promise.resolve({ success: true });
   },
 };
