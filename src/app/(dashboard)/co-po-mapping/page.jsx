@@ -67,7 +67,29 @@ export default function COPOMappingPage() {
         try {
             setIsSaving(true);
             setSaveError(null);
-            await outcomeService.updateMapping(selectedCourseId, mappings);
+
+            // Compile clean CO x PO pairs for active course to keep payload small & fast
+            const cleanMatrix = {};
+            cos.forEach((co) => {
+                pos.forEach((po) => {
+                    const keys = [
+                        `${co.id}_${po.id}`,
+                        `${co.code}_${po.code}`,
+                        `${co.code.toLowerCase()}_${po.code.toLowerCase()}`,
+                        `co-${co.code.replace(/\D/g, '')}_po-${po.code.replace(/\D/g, '')}`,
+                    ];
+                    let val = 0;
+                    for (const k of keys) {
+                        if (mappings[k] !== undefined && mappings[k] !== null) {
+                            val = Number(mappings[k]);
+                            break;
+                        }
+                    }
+                    cleanMatrix[`${co.code}_${po.code}`] = val;
+                });
+            });
+
+            await outcomeService.updateMapping(selectedCourseId, cleanMatrix);
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000);
         } catch (err) {

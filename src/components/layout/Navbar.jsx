@@ -1,10 +1,12 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Bell, ChevronDown, LogOut, Shield, Sparkles } from 'lucide-react';
+import { Search, Bell, ChevronDown, LogOut, Shield, Sparkles, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 export const Navbar = ({ userName: fallbackName, userRole: fallbackRole, }) => {
     const { user, logout, isAuthenticated } = useAuth();
+    const { theme, toggleTheme, isDark } = useTheme();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     // Close dropdown on outside click
@@ -72,7 +74,22 @@ export const Navbar = ({ userName: fallbackName, userRole: fallbackRole, }) => {
           </span>
         </div>
 
-        <button aria-label="Notifications" className="relative text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100">
+        {/* Dark / Light Mode Toggle */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="relative text-gray-500 hover:text-gray-700 transition-colors p-1.5 rounded-lg hover:bg-gray-100 flex items-center justify-center cursor-pointer"
+        >
+          {isDark ? (
+            <Sun className="h-5 w-5 text-amber-400" />
+          ) : (
+            <Moon className="h-5 w-5 text-slate-600" />
+          )}
+        </button>
+
+        <button aria-label="Notifications" className="relative text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-100 cursor-pointer">
           <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
           <Bell className="h-5 w-5"/>
         </button>
@@ -123,6 +140,16 @@ export const Navbar = ({ userName: fallbackName, userRole: fallbackRole, }) => {
                   <Shield className="w-4 h-4 mr-2 text-gray-400"/>
                   Role-Based User Directory
                 </Link>
+
+                <button type="button" onClick={() => { toggleTheme(); }} className="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+                  <span className="flex items-center">
+                    {isDark ? <Sun className="w-4 h-4 mr-2 text-amber-500" /> : <Moon className="w-4 h-4 mr-2 text-slate-500" />}
+                    Theme Mode
+                  </span>
+                  <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
+                    {isDark ? 'Dark' : 'Light'}
+                  </span>
+                </button>
               </div>
 
               <div className="border-t border-gray-100 pt-1">
